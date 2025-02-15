@@ -16,6 +16,9 @@ import java.util.Random
 
 class MainActivity : AppCompatActivity() {
     private var score :Int = 0;
+    private var correctAnswer: String = "";
+    private var submittedAnswer: String = "";
+    private var correctImage: Int = 0;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,62 +31,72 @@ class MainActivity : AppCompatActivity() {
         }
         // above init layout ui
 
-        val gridLayout = findViewById<GridLayout>(R.id.gridRadioGroup)
-        val radioButtons = mutableListOf<RadioButton>()
-
-        for (i in 0 until gridLayout.childCount){
-            val child = gridLayout.getChildAt(i)
-            if (child is RadioButton){
-                radioButtons.add(child)
-            }
-        }
-
-        for (radio in radioButtons){
-            radio.setOnClickListener{
-                for (r in radioButtons){
-                    if (r!=radio) r.isChecked = false
-                }
-            }
-        }
-
         pickRandomPicture()
         setScore(0)
     }
 
-    fun radioButtonOnClick(view: View)
-    {
-        if (view.id == R.id.radioButton){
-            findViewById<TextView>(R.id.score_text).text = "R.id.radioButton"
+    fun radioButtonOnClick(view: View) {
+        val radioButtons = listOf(
+            R.id.iron_s,
+            R.id.roselia_s,
+            R.id.jumpluff_s,
+            R.id.far_s
+        )
+
+        for (id in radioButtons) {
+            findViewById<RadioButton>(id).isChecked = false
         }
 
-        if (view.id == R.id.radioButton2){
-            findViewById<TextView>(R.id.score_text).text = "R.id.radioButton2"
-        }
+        val selectedRadioButton = findViewById<RadioButton>(view.id)
+        selectedRadioButton.isChecked = true
 
-        if (view.id == R.id.radioButton3){
-            findViewById<TextView>(R.id.score_text).text = "R.id.radioButton3"
-        }
-        if (view.id == R.id.radioButton4){
-            findViewById<TextView>(R.id.score_text).text = "R.id.radioButton3"
+        submittedAnswer = when (view.id) {
+            R.id.iron_s -> "Iron Boulder"
+            R.id.roselia_s -> "Roselia"
+            R.id.jumpluff_s -> "Jumpluff"
+            R.id.far_s -> "Farfetch'd"
+            else -> ""
         }
     }
 
+
     fun submissionButtonOnClick(view: View)
     {
-        Log.d("mad", "Submit")
-
-        pickRandomPicture()
+        var imageView = findViewById<ImageView>(R.id.you_won_image)
+        if (correctAnswer == submittedAnswer){
+            imageView.setImageResource(correctImage)
+            setScore(score+1)
+        }else{
+            setScore(score-1)
+        }
     }
 
     fun pickRandomPicture()
     {
-        var monsters = arrayOf(R.drawable.far_s, R.drawable.iron_s, R.drawable.jumpluff_s, R.drawable.roselia_s)
+        var monsters = mapOf(
+            R.drawable.far_s to "Farfetch'd",
+            R.drawable.iron_s to "Iron Boulder",
+            R.drawable.jumpluff_s to "Jumpluff",
+            R.drawable.roselia_s to "Roselia")
+
+        var shuffledMonsters = monsters.toList().shuffled().toMap()
+
         var mysteryMonster = findViewById<ImageView>(R.id.you_won_image)
 
-        var rand = Random()
+        for (shuffledMonster in shuffledMonsters) {
+            mysteryMonster.setImageResource(shuffledMonster.key)
+            mysteryMonster.tag=shuffledMonster.key
+            correctAnswer = shuffledMonster.value
 
-        var num = rand.nextInt(4)
-        mysteryMonster.setImageResource(monsters[num])
+            val correctImageResource = when (shuffledMonster.key) {
+                R.drawable.far_s -> R.drawable.far
+                R.drawable.iron_s -> R.drawable.iron
+                R.drawable.jumpluff_s -> R.drawable.jumpluff
+                R.drawable.roselia_s -> R.drawable.roselia
+                else -> shuffledMonster.key
+            }
+            correctImage = correctImageResource
+        }
     }
 
     fun setScore(_score: Int)
