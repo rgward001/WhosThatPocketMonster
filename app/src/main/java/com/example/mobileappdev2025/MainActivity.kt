@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.GridLayout
 import android.widget.ImageView
+import android.widget.RadioButton
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -13,8 +15,6 @@ import androidx.core.view.WindowInsetsCompat
 import java.util.Random
 
 class MainActivity : AppCompatActivity() {
-    private var leftNum :Int = 0;
-    private var rightNum :Int = 0;
     private var score :Int = 0;
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,7 +28,25 @@ class MainActivity : AppCompatActivity() {
         }
         // above init layout ui
 
-        pickRandomNumber()
+        val gridLayout = findViewById<GridLayout>(R.id.gridRadioGroup)
+        val radioButtons = mutableListOf<RadioButton>()
+
+        for (i in 0 until gridLayout.childCount){
+            val child = gridLayout.getChildAt(i)
+            if (child is RadioButton){
+                radioButtons.add(child)
+            }
+        }
+
+        for (radio in radioButtons){
+            radio.setOnClickListener{
+                for (r in radioButtons){
+                    if (r!=radio) r.isChecked = false
+                }
+            }
+        }
+
+        pickRandomPicture()
         setScore(0)
     }
 
@@ -45,42 +63,27 @@ class MainActivity : AppCompatActivity() {
         if (view.id == R.id.radioButton3){
             findViewById<TextView>(R.id.score_text).text = "R.id.radioButton3"
         }
+        if (view.id == R.id.radioButton4){
+            findViewById<TextView>(R.id.score_text).text = "R.id.radioButton3"
+        }
     }
 
-    fun leftButtonOnClick(view: View)
+    fun submissionButtonOnClick(view: View)
     {
-        if (leftNum > rightNum)
-            setScore(score+1)
-        else
-            setScore(score-1)
+        Log.d("mad", "Submit")
 
-        pickRandomNumber()
+        pickRandomPicture()
     }
 
-    fun rightButtonOnClick(view: View)
+    fun pickRandomPicture()
     {
-        if (leftNum < rightNum)
-            setScore(score+1)
-        else
-            setScore(score-1)
-
-        pickRandomNumber()
-    }
-
-    fun pickRandomNumber()
-    {
-        var leftButton = findViewById<Button>(R.id.left_number_button)
-        var rightButton = findViewById<Button>(R.id.right_number_button)
+        var monsters = arrayOf(R.drawable.far_s, R.drawable.iron_s, R.drawable.jumpluff_s, R.drawable.roselia_s)
+        var mysteryMonster = findViewById<ImageView>(R.id.you_won_image)
 
         var rand = Random()
 
-        do {
-            leftNum = rand.nextInt(10)
-            rightNum = rand.nextInt(10)
-        } while (leftNum == rightNum)
-
-        leftButton.text = "$leftNum"
-        rightButton.text = "$rightNum"
+        var num = rand.nextInt(4)
+        mysteryMonster.setImageResource(monsters[num])
     }
 
     fun setScore(_score: Int)
@@ -88,8 +91,6 @@ class MainActivity : AppCompatActivity() {
         score = _score;
 
         // vari = (condition) ? true : false;
-
-        findViewById<ImageView>(R.id.you_won_image).visibility = if (score > 5) View.VISIBLE else View.INVISIBLE;
 
         findViewById<TextView>(R.id.score_text).text = "Score: $score"
     }
