@@ -12,6 +12,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import java.util.Random
 
 class MainActivity : AppCompatActivity() {
@@ -19,6 +21,12 @@ class MainActivity : AppCompatActivity() {
     private var correctAnswer: String = "";
     private var submittedAnswer: String = "";
     private var correctImage: Int = 0;
+    private val monsters = mapOf(
+        R.drawable.far_s to "Farfetch'd",
+        R.drawable.iron_s to "Iron Boulder",
+        R.drawable.jumpluff_s to "Jumpluff",
+        R.drawable.roselia_s to "Roselia")
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,8 +39,8 @@ class MainActivity : AppCompatActivity() {
         }
         // above init layout ui
 
-        pickRandomPicture()
         setScore(0)
+        pickRandomPicture()
     }
 
     fun radioButtonOnClick(view: View) {
@@ -62,24 +70,31 @@ class MainActivity : AppCompatActivity() {
 
     fun submissionButtonOnClick(view: View)
     {
-        var imageView = findViewById<ImageView>(R.id.you_won_image)
+        val imageView = findViewById<ImageView>(R.id.you_won_image)
+        val nextButton = findViewById<Button>(R.id.nextButton)
+        val submitButton = findViewById<Button>(R.id.submission_button)
         if (correctAnswer == submittedAnswer){
             imageView.setImageResource(correctImage)
             setScore(score+1)
         }else{
+            imageView.setImageResource(correctImage)
             setScore(score-1)
         }
+
+        submitButton.visibility = View.GONE
+        nextButton.visibility = View.VISIBLE
+
+        nextButton.setOnClickListener{
+            pickRandomPicture()
+            nextButton.visibility = View.GONE
+            submitButton.visibility = View.VISIBLE
+        }
+
     }
 
     fun pickRandomPicture()
     {
-        var monsters = mapOf(
-            R.drawable.far_s to "Farfetch'd",
-            R.drawable.iron_s to "Iron Boulder",
-            R.drawable.jumpluff_s to "Jumpluff",
-            R.drawable.roselia_s to "Roselia")
-
-        var shuffledMonsters = monsters.toList().shuffled().toMap()
+        val shuffledMonsters = monsters.toList().shuffled().toMap()
 
         var mysteryMonster = findViewById<ImageView>(R.id.you_won_image)
 
